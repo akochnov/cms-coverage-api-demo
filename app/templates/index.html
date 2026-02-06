@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}CMS Coverage Search - Home{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Medicare Coverage Search</h1>
+        <p class="text-gray-600">Search LCDs, NCDs, and Articles by keyword</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form action="/search" method="get" class="space-y-6">
+            <!-- Primary Search Fields -->
+            <div>
+                <label for="keyword" class="block text-sm font-medium text-gray-700 mb-1">Keyword Search</label>
+                <input type="text" id="keyword" name="keyword"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                       placeholder="e.g., diabetes, lumbar, wheelchair, oxygen">
+            </div>
+
+            <!-- Filters -->
+            <div class="border-t pt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="doc_type" class="block text-sm text-gray-600 mb-1">Document Type</label>
+                        <select id="doc_type" name="doc_type"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all">All Types</option>
+                            <option value="lcd">LCDs Only</option>
+                            <option value="ncd">NCDs Only</option>
+                            <option value="article">Articles Only</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <button type="submit"
+                        class="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors">
+                    Search Coverage Policies
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="font-semibold text-gray-800 mb-2">Local Coverage (LCDs)</h3>
+            <p class="text-sm text-gray-600">Medicare Administrative Contractor decisions on whether to cover items or services in their jurisdiction.</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="font-semibold text-gray-800 mb-2">National Coverage (NCDs)</h3>
+            <p class="text-sm text-gray-600">CMS decisions about whether Medicare will cover items or services nationwide.</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="font-semibold text-gray-800 mb-2">Articles</h3>
+            <p class="text-sm text-gray-600">Billing and coding guidance documents that accompany LCDs.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

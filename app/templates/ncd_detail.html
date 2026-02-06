@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}NCD {{ ncd.document_display_id if ncd else '' }} - CMS Coverage Search{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <a href="javascript:history.back()" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">&larr; Back to results</a>
+
+    {% if error %}
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if ncd %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <!-- Header -->
+        <div class="bg-purple-800 text-white px-6 py-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="bg-purple-600 px-2 py-1 rounded text-sm">NCD</span>
+                {% if ncd.effective_end_date and ncd.effective_end_date != 'N/A' %}
+                <span class="px-2 py-1 rounded text-sm bg-gray-500">Retired</span>
+                {% else %}
+                <span class="px-2 py-1 rounded text-sm bg-green-500">Active</span>
+                {% endif %}
+            </div>
+            <h1 class="text-2xl font-bold">{{ ncd.title or 'Untitled NCD' }}</h1>
+            <div class="text-purple-200 mt-1">
+                <span>NCD ID: {{ ncd.document_display_id or ncd.document_id }}</span>
+                {% if ncd.publication_number %}<span class="ml-4">Publication: {{ ncd.publication_number }}</span>{% endif %}
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-6">
+            <!-- Basic Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% if ncd.effective_date %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Effective Date</h3>
+                    <p class="text-gray-900">{{ ncd.effective_date }}</p>
+                </div>
+                {% endif %}
+                {% if ncd.effective_end_date and ncd.effective_end_date != 'N/A' %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">End Date</h3>
+                    <p class="text-gray-900">{{ ncd.effective_end_date }}</p>
+                </div>
+                {% endif %}
+                {% if ncd.implementation_date %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Implementation Date</h3>
+                    <p class="text-gray-900">{{ ncd.implementation_date }}</p>
+                </div>
+                {% endif %}
+                {% if ncd.benefit_category %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Benefit Category</h3>
+                    <p class="text-gray-900">{{ ncd.benefit_category }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Item/Service Description -->
+            {% if ncd.item_service_description %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Item/Service Description</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.item_service_description | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Indications and Limitations -->
+            {% if ncd.indications_limitations %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Indications and Limitations</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.indications_limitations | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Cross Reference -->
+            {% if ncd.cross_reference %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Cross Reference</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.cross_reference | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Revision History -->
+            {% if ncd.revision_history %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Revision History</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.revision_history | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Transmittal -->
+            {% if ncd.transmittal_number or ncd.transmittal_url %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Transmittal</h3>
+                <div class="bg-gray-50 p-4 rounded">
+                    {% if ncd.transmittal_number %}<p class="text-gray-700">Transmittal Number: {{ ncd.transmittal_number }}</p>{% endif %}
+                    {% if ncd.transmittal_url %}<p class="mt-2"><a href="{{ ncd.transmittal_url }}" target="_blank" class="text-blue-600 hover:underline">View Transmittal Document</a></p>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reasons for Denial -->
+            {% if ncd.reasons_for_denial %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Reasons for Denial</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.reasons_for_denial | safe }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+        <p class="text-gray-500">NCD not found.</p>
+        <a href="/" class="inline-block mt-4 text-blue-600 hover:text-blue-800">Back to search</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

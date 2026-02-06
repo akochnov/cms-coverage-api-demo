@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}LCD {{ lcd.display_id if lcd else '' }} - CMS Coverage Search{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <a href="javascript:history.back()" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">&larr; Back to results</a>
+
+    {% if error %}
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if lcd %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-800 text-white px-6 py-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="bg-blue-600 px-2 py-1 rounded text-sm">LCD</span>
+                {% if lcd.status == 'Active' or lcd.status == 'Final' %}
+                <span class="px-2 py-1 rounded text-sm bg-green-500">{{ lcd.status }}</span>
+                {% elif lcd.status == 'Retired' %}
+                <span class="px-2 py-1 rounded text-sm bg-gray-500">Retired</span>
+                {% else %}
+                <span class="px-2 py-1 rounded text-sm bg-yellow-500 text-gray-900">{{ lcd.status or 'Unknown' }}</span>
+                {% endif %}
+            </div>
+            <h1 class="text-2xl font-bold">{{ lcd.title or 'Untitled LCD' }}</h1>
+            <p class="text-blue-200 mt-1">LCD ID: {{ lcd.display_id or lcd.lcd_id }}</p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-6">
+            <!-- Basic Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% if lcd.determination_number %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Determination Number</h3>
+                    <p class="text-gray-900">{{ lcd.determination_number }}</p>
+                </div>
+                {% endif %}
+                {% if lcd.rev_eff_date %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Revision Effective Date</h3>
+                    <p class="text-gray-900">{{ lcd.rev_eff_date }}</p>
+                </div>
+                {% endif %}
+                {% if lcd.orig_det_eff_date %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Original Effective Date</h3>
+                    <p class="text-gray-900">{{ lcd.orig_det_eff_date }}</p>
+                </div>
+                {% endif %}
+                {% if lcd.date_retired %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Retirement Date</h3>
+                    <p class="text-gray-900">{{ lcd.date_retired }}</p>
+                </div>
+                {% endif %}
+                {% if lcd.last_reviewed_on %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Last Reviewed</h3>
+                    <p class="text-gray-900">{{ lcd.last_reviewed_on }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- CMS Coverage Policy -->
+            {% if lcd.cms_cov_policy %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">CMS Coverage Policy</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.cms_cov_policy | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Indications -->
+            {% if lcd.indication %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Indications and Limitations of Coverage</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.indication | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Coding Guidelines -->
+            {% if lcd.coding_guidelines %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Coding Guidelines</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.coding_guidelines | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Documentation Requirements -->
+            {% if lcd.doc_reqs %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Documentation Requirements</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.doc_reqs | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Utilization Guidelines -->
+            {% if lcd.util_guide %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Utilization Guidelines</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.util_guide | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Summary of Evidence -->
+            {% if lcd.summary_of_evidence %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Summary of Evidence</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.summary_of_evidence | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Analysis of Evidence -->
+            {% if lcd.analysis_of_evidence %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Analysis of Evidence</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.analysis_of_evidence | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Bibliography -->
+            {% if lcd.bibliography %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Bibliography</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.bibliography | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Keywords -->
+            {% if lcd.keywords %}
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Keywords</h3>
+                <div class="bg-gray-50 p-4 rounded">
+                    <p class="text-gray-700">{{ lcd.keywords }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+        <p class="text-gray-500">LCD not found.</p>
+        <a href="/" class="inline-block mt-4 text-blue-600 hover:text-blue-800">Back to search</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
