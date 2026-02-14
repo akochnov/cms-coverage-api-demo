@@ -31,6 +31,25 @@
             </div>
         </div>
 
+        <!-- Jump Nav -->
+        <div class="px-6 py-3 border-b bg-gray-50 flex gap-2 overflow-x-auto">
+            {% if ncd.transmittal_number or ncd.transmittal_url or ncd.reasons_for_denial %}
+            <a href="#billing-coding" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 whitespace-nowrap">Billing &amp; Coding</a>
+            {% endif %}
+            {% if ncd.item_service_description %}
+            <a href="#item-service" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Item/Service</a>
+            {% endif %}
+            {% if ncd.indications_limitations %}
+            <a href="#indications" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Indications</a>
+            {% endif %}
+            {% if ncd.cross_reference %}
+            <a href="#cross-reference" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Cross Reference</a>
+            {% endif %}
+            {% if ncd.revision_history %}
+            <a href="#revision-history" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Revision History</a>
+            {% endif %}
+        </div>
+
         <!-- Content -->
         <div class="p-6 space-y-6">
             <!-- Basic Info -->
@@ -61,25 +80,53 @@
                 {% endif %}
             </div>
 
+            <!-- Billing & Coding Section -->
+            {% if ncd.transmittal_number or ncd.transmittal_url or ncd.reasons_for_denial %}
+            <div id="billing-coding" class="billing-coding-section border-l-4 border-green-600 bg-green-50 rounded-r-lg overflow-hidden">
+                <div class="bg-green-700 text-white px-4 py-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <h2 class="text-lg font-bold">Billing &amp; Coding</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    {% if ncd.transmittal_number or ncd.transmittal_url %}
+                    <div>
+                        <h3 class="text-green-800 font-semibold mb-2">Transmittal</h3>
+                        <div class="bg-white p-4 rounded">
+                            {% if ncd.transmittal_number %}<p class="text-gray-700">Transmittal Number: {{ ncd.transmittal_number }}</p>{% endif %}
+                            {% if ncd.transmittal_url %}<p class="mt-2"><a href="{{ ncd.transmittal_url }}" target="_blank" class="text-blue-600 hover:underline">View Transmittal Document</a></p>{% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if ncd.reasons_for_denial %}
+                    <div>
+                        <h3 class="text-green-800 font-semibold mb-2">Reasons for Denial</h3>
+                        <div class="prose max-w-none text-gray-700 bg-white p-4 rounded">{{ ncd.reasons_for_denial | unescape_cms | safe }}</div>
+                    </div>
+                    {% endif %}
+                    <p class="text-sm italic text-green-700">Coding details for NCDs are typically found in the linked Transmittal document.</p>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Item/Service Description -->
             {% if ncd.item_service_description %}
-            <div>
+            <div id="item-service">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Item/Service Description</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.item_service_description | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.item_service_description | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Indications and Limitations -->
             {% if ncd.indications_limitations %}
-            <div>
+            <div id="indications">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Indications and Limitations</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.indications_limitations | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.indications_limitations | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Cross Reference -->
             {% if ncd.cross_reference %}
-            <div>
+            <div id="cross-reference">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Cross Reference</h3>
                 <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.cross_reference | safe }}</div>
             </div>
@@ -87,28 +134,9 @@
 
             <!-- Revision History -->
             {% if ncd.revision_history %}
-            <div>
+            <div id="revision-history">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Revision History</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.revision_history | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
-            </div>
-            {% endif %}
-
-            <!-- Transmittal -->
-            {% if ncd.transmittal_number or ncd.transmittal_url %}
-            <div>
-                <h3 class="text-lg font-medium text-gray-800 mb-2">Transmittal</h3>
-                <div class="bg-gray-50 p-4 rounded">
-                    {% if ncd.transmittal_number %}<p class="text-gray-700">Transmittal Number: {{ ncd.transmittal_number }}</p>{% endif %}
-                    {% if ncd.transmittal_url %}<p class="mt-2"><a href="{{ ncd.transmittal_url }}" target="_blank" class="text-blue-600 hover:underline">View Transmittal Document</a></p>{% endif %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Reasons for Denial -->
-            {% if ncd.reasons_for_denial %}
-            <div>
-                <h3 class="text-lg font-medium text-gray-800 mb-2">Reasons for Denial</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.reasons_for_denial | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ ncd.revision_history | unescape_cms | safe }}</div>
             </div>
             {% endif %}
         </div>

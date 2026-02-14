@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Code Lookup Results - CMS Coverage Search{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <a href="/codes" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">&larr; Back to Code Lookup</a>
+
+    {% if error %}
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if code %}
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">
+            {% if direction == 'cpt_to_icd' %}
+            ICD-10 Codes for CPT/HCPCS <span class="text-blue-700">{{ code }}</span>
+            {% else %}
+            CPT/HCPCS Codes for ICD-10 <span class="text-green-700">{{ code }}</span>
+            {% endif %}
+        </h1>
+        {% if keyword %}
+        <p class="text-gray-500 mt-1">Filtered by keyword: "{{ keyword }}"</p>
+        {% endif %}
+        <p class="text-gray-500 mt-1">{{ results|length }} article{{ 's' if results|length != 1 else '' }} found</p>
+    </div>
+    {% endif %}
+
+    {% if results %}
+    <div class="space-y-6">
+        {% for result in results %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-gray-700 text-white px-5 py-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                        <a href="/article/{{ result.article_id }}?version={{ result.article_version }}"
+                           class="text-white hover:text-blue-200 font-medium">{{ result.article_title }}</a>
+                        <span class="text-gray-300 text-sm ml-2">Article {{ result.article_id }}</span>
+                    </div>
+                    <a href="/article/{{ result.article_id }}/codes?version={{ result.article_version }}"
+                       class="text-sm bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded transition-colors">View All Codes</a>
+                </div>
+                {% if result.contractor %}
+                <p class="text-gray-300 text-sm mt-1">{{ result.contractor }}</p>
+                {% endif %}
+            </div>
+
+            <div class="p-5">
+                {% if direction == 'cpt_to_icd' %}
+                    {% if result.cpt_description %}
+                    <p class="text-gray-600 mb-3">
+                        <span class="font-medium text-blue-700">{{ result.cpt_code }}</span>: {{ result.cpt_description }}
+                    </p>
+                    {% endif %}
+
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="text-left px-3 py-2 font-medium text-gray-600 w-32">ICD-10 Code</th>
+                                <th class="text-left px-3 py-2 font-medium text-gray-600">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for icd in result.icd10_codes %}
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-3 py-2 font-mono text-green-700 font-medium">{{ icd.code }}</td>
+                                <td class="px-3 py-2 text-gray-700">{{ icd.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <p class="text-xs text-gray-400 mt-2">{{ result.icd10_codes|length }} ICD-10 code{{ 's' if result.icd10_codes|length != 1 else '' }}</p>
+
+                {% else %}
+                    {% if result.icd10_description %}
+                    <p class="text-gray-600 mb-3">
+                        <span class="font-medium text-green-700">{{ result.icd10_code }}</span>: {{ result.icd10_description }}
+                    </p>
+                    {% endif %}
+
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="text-left px-3 py-2 font-medium text-gray-600 w-32">CPT/HCPCS</th>
+                                <th class="text-left px-3 py-2 font-medium text-gray-600">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cpt in result.cpt_codes %}
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-3 py-2 font-mono text-blue-700 font-medium">{{ cpt.code }}</td>
+                                <td class="px-3 py-2 text-gray-700">{{ cpt.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <p class="text-xs text-gray-400 mt-2">{{ result.cpt_codes|length }} CPT/HCPCS code{{ 's' if result.cpt_codes|length != 1 else '' }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% elif code and not error %}
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+        <p class="text-gray-500 text-lg mb-2">No code mappings found for <strong>{{ code }}</strong>.</p>
+        <p class="text-gray-400">Try a different code or broaden the keyword filter. Only "Billing &amp; Coding" articles with structured code data are searched.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

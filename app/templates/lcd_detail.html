@@ -30,6 +30,34 @@
             <p class="text-blue-200 mt-1">LCD ID: {{ lcd.display_id or lcd.lcd_id }}</p>
         </div>
 
+        <!-- Jump Nav -->
+        <div class="px-6 py-3 border-b bg-gray-50 flex gap-2 overflow-x-auto">
+            {% if lcd.coding_guidelines or lcd.diagnoses_support %}
+            <a href="#billing-coding" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 whitespace-nowrap">Billing &amp; Coding</a>
+            {% endif %}
+            {% if lcd.cms_cov_policy %}
+            <a href="#coverage-policy" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Coverage Policy</a>
+            {% endif %}
+            {% if lcd.indication %}
+            <a href="#indications" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Indications</a>
+            {% endif %}
+            {% if lcd.doc_reqs %}
+            <a href="#doc-reqs" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Doc Requirements</a>
+            {% endif %}
+            {% if lcd.util_guide %}
+            <a href="#util-guide" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Utilization</a>
+            {% endif %}
+            {% if lcd.summary_of_evidence or lcd.analysis_of_evidence %}
+            <a href="#evidence" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Evidence</a>
+            {% endif %}
+            {% if lcd.bibliography %}
+            <a href="#bibliography" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Bibliography</a>
+            {% endif %}
+            {% if lcd.keywords %}
+            <a href="#keywords" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Keywords</a>
+            {% endif %}
+        </div>
+
         <!-- Content -->
         <div class="p-6 space-y-6">
             <!-- Basic Info -->
@@ -66,73 +94,88 @@
                 {% endif %}
             </div>
 
+            <!-- Billing & Coding Section -->
+            {% if lcd.coding_guidelines or lcd.diagnoses_support %}
+            <div id="billing-coding" class="billing-coding-section border-l-4 border-green-600 bg-green-50 rounded-r-lg overflow-hidden">
+                <div class="bg-green-700 text-white px-4 py-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <h2 class="text-lg font-bold">Billing &amp; Coding</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    {% if lcd.coding_guidelines %}
+                    <div>
+                        <h3 class="text-green-800 font-semibold mb-2">Coding Guidelines</h3>
+                        <div class="prose max-w-none text-gray-700 bg-white p-4 rounded">{{ lcd.coding_guidelines | unescape_cms | safe }}</div>
+                    </div>
+                    {% endif %}
+                    {% if lcd.diagnoses_support %}
+                    <div>
+                        <h3 class="text-green-800 font-semibold mb-2">Diagnoses Support</h3>
+                        <div class="prose max-w-none text-gray-700 bg-white p-4 rounded">{{ lcd.diagnoses_support | unescape_cms | safe }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- CMS Coverage Policy -->
             {% if lcd.cms_cov_policy %}
-            <div>
+            <div id="coverage-policy">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">CMS Coverage Policy</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.cms_cov_policy | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.cms_cov_policy | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Indications -->
             {% if lcd.indication %}
-            <div>
+            <div id="indications">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Indications and Limitations of Coverage</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.indication | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
-            </div>
-            {% endif %}
-
-            <!-- Coding Guidelines -->
-            {% if lcd.coding_guidelines %}
-            <div>
-                <h3 class="text-lg font-medium text-gray-800 mb-2">Coding Guidelines</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.coding_guidelines | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.indication | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Documentation Requirements -->
             {% if lcd.doc_reqs %}
-            <div>
+            <div id="doc-reqs">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Documentation Requirements</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.doc_reqs | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.doc_reqs | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Utilization Guidelines -->
             {% if lcd.util_guide %}
-            <div>
+            <div id="util-guide">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Utilization Guidelines</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.util_guide | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.util_guide | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
-            <!-- Summary of Evidence -->
+            <!-- Evidence -->
             {% if lcd.summary_of_evidence %}
-            <div>
+            <div id="evidence">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Summary of Evidence</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.summary_of_evidence | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.summary_of_evidence | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
-            <!-- Analysis of Evidence -->
             {% if lcd.analysis_of_evidence %}
-            <div>
+            <div {% if not lcd.summary_of_evidence %}id="evidence"{% endif %}>
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Analysis of Evidence</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.analysis_of_evidence | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.analysis_of_evidence | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Bibliography -->
             {% if lcd.bibliography %}
-            <div>
+            <div id="bibliography">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Bibliography</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.bibliography | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ lcd.bibliography | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Keywords -->
             {% if lcd.keywords %}
-            <div>
+            <div id="keywords">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Keywords</h3>
                 <div class="bg-gray-50 p-4 rounded">
                     <p class="text-gray-700">{{ lcd.keywords }}</p>

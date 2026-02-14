@@ -49,6 +49,8 @@ class CMSCoverageClient:
         self._token_expires_at: float = 0
         self._contract_types_cache: list[dict] | None = None
         self._contract_types_cached_at: float = 0
+        self._code_cache: dict[tuple[str, str, str], tuple[float, list[dict]]] = {}
+        self._CODE_CACHE_TTL = 3600  # 1 hour
 
     def _get_client(self, token: str | None = None) -> httpx.AsyncClient:
         """Create an async HTTP client."""
@@ -236,6 +238,59 @@ class CMSCoverageClient:
             )
             response.raise_for_status()
             return response.json()
+
+    async def _get_article_sub(self, sub_endpoint: str, article_id: str, version: str = "1") -> list[dict]:
+        """Fetch an article sub-endpoint with caching."""
+        cache_key = (sub_endpoint, article_id, version)
+        now = time.time()
+        cached = self._code_cache.get(cache_key)
+        if cached and (now - cached[0]) < self._CODE_CACHE_TTL:
+            return cached[1]
+
+        token = await self.get_license_token()
+        async with self._get_client(token) as client:
+            response = await client.get(
+                f"/v1/data/article/{sub_endpoint}",
+                params={"articleid": article_id, "ver": version}
+            )
+            response.raise_for_status()
+            data = response.json().get("data", [])
+
+        self._code_cache[cache_key] = (now, data)
+        return data
+
+    async def get_article_hcpc_codes(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("hcpc-code", article_id, version)
+
+    async def get_article_hcpc_code_groups(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("hcpc-code-group", article_id, version)
+
+    async def get_article_icd10_covered(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("icd10-covered", article_id, version)
+
+    async def get_article_icd10_covered_groups(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("icd10-covered-group", article_id, version)
+
+    async def get_article_icd10_noncovered(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("icd10-noncovered", article_id, version)
+
+    async def get_article_icd10_noncovered_groups(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("icd10-noncovered-group", article_id, version)
+
+    async def get_article_icd10_pcs_codes(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("icd10-pcs-code", article_id, version)
+
+    async def get_article_hcpc_modifiers(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("hcpc-modifier", article_id, version)
+
+    async def get_article_bill_codes(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("bill-codes", article_id, version)
+
+    async def get_article_revenue_codes(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("revenue-code", article_id, version)
+
+    async def get_article_related_documents(self, article_id: str, version: str = "1") -> list[dict]:
+        return await self._get_article_sub("related-documents", article_id, version)
 
 
 # Global client instance

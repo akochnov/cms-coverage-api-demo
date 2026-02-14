@@ -3,7 +3,7 @@
 {% block title %}Article {{ article.display_id if article else '' }} - CMS Coverage Search{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="max-w-5xl mx-auto">
     <a href="javascript:history.back()" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">&larr; Back to results</a>
 
     {% if error %}
@@ -13,6 +13,7 @@
     {% endif %}
 
     {% if article %}
+    {% set is_billing = article.article_type_description and ('Billing' in article.article_type_description or 'Coding' in article.article_type_description) %}
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <!-- Header -->
         <div class="bg-orange-700 text-white px-6 py-4">
@@ -28,6 +29,41 @@
             </div>
             <h1 class="text-2xl font-bold">{{ article.title or 'Untitled Article' }}</h1>
             <p class="text-orange-200 mt-1">Article ID: {{ article.display_id or article.article_id }}</p>
+        </div>
+
+        <!-- Jump Nav -->
+        <div class="px-6 py-3 border-b bg-gray-50 flex gap-2 overflow-x-auto">
+            {% if is_billing and (article.description or article.other_comments) %}
+            <a href="#billing-coding" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 whitespace-nowrap">Billing &amp; Coding</a>
+            {% else %}
+            {% if article.description %}
+            <a href="#description" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Description</a>
+            {% endif %}
+            {% if article.other_comments %}
+            <a href="#other-comments" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Additional Info</a>
+            {% endif %}
+            {% endif %}
+            {% if code_data and code_data.hcpc_codes %}
+            <a href="#hcpcs" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 whitespace-nowrap">HCPCS/CPT ({{ code_data.hcpc_codes|length }})</a>
+            {% endif %}
+            {% if code_data and code_data.icd10_covered %}
+            <a href="#icd10-covered" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 whitespace-nowrap">ICD-10 Covered ({{ code_data.icd10_covered|length }})</a>
+            {% endif %}
+            {% if code_data and code_data.icd10_noncovered %}
+            <a href="#icd10-noncovered" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200 whitespace-nowrap">ICD-10 Non-Covered ({{ code_data.icd10_noncovered|length }})</a>
+            {% endif %}
+            {% if code_data and code_data.mapping and code_data.mapping.groups %}
+            <a href="#mapping" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 whitespace-nowrap">CPT &harr; ICD-10 Map</a>
+            {% endif %}
+            {% if article.cms_cov_policy %}
+            <a href="#coverage-policy" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Coverage Policy</a>
+            {% endif %}
+            {% if article.keywords %}
+            <a href="#keywords" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Keywords</a>
+            {% endif %}
+            {% if article.history_exp %}
+            <a href="#revision-history" class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap">Revision History</a>
+            {% endif %}
         </div>
 
         <!-- Content -->
@@ -66,33 +102,234 @@
                 {% endif %}
             </div>
 
-            <!-- Description -->
-            {% if article.description %}
-            <div>
-                <h3 class="text-lg font-medium text-gray-800 mb-2">Description</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.description | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+            <!-- Related LCDs -->
+            {% if code_data and code_data.related_docs %}
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-blue-800 mb-1">Related LCD{{ 's' if code_data.related_docs|length > 1 else '' }}</h3>
+                {% for doc in code_data.related_docs %}
+                <a href="/lcd/{{ doc.r_lcd_id }}?version={{ doc.r_lcd_version or '1' }}" class="text-blue-700 hover:text-blue-900 font-medium">LCD {{ doc.r_lcd_id }}</a>{{ ", " if not loop.last else "" }}
+                {% endfor %}
             </div>
             {% endif %}
+
+            <!-- Billing & Coding Articles: green wrapper -->
+            {% if is_billing and (article.description or article.other_comments) %}
+            <div id="billing-coding" class="billing-coding-section border-l-4 border-green-600 bg-green-50 rounded-r-lg overflow-hidden">
+                <div class="bg-green-700 text-white px-4 py-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <h2 class="text-lg font-bold">Billing &amp; Coding</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    {% if article.description %}
+                    <div>
+                        <h3 class="text-green-800 font-semibold mb-2">Description</h3>
+                        <div class="prose max-w-none text-gray-700 bg-white p-4 rounded">{{ article.description | unescape_cms | safe }}</div>
+                    </div>
+                    {% endif %}
+                    {% if article.other_comments %}
+                    <div>
+                        <h3 class="text-green-800 font-semibold mb-2">Additional Information</h3>
+                        <div class="prose max-w-none text-gray-700 bg-white p-4 rounded">{{ article.other_comments | unescape_cms | safe }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <!-- Non-billing Articles: standard gray style -->
+            {% if article.description %}
+            <div id="description">
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Description</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.description | unescape_cms | safe }}</div>
+            </div>
+            {% endif %}
+
+            {% if article.other_comments %}
+            <div id="other-comments">
+                <h3 class="text-lg font-medium text-gray-800 mb-2">Additional Information</h3>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.other_comments | unescape_cms | safe }}</div>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            {# ── STRUCTURED CODE SECTIONS ── #}
+
+            {% if code_data and code_data.hcpc_codes %}
+            <!-- HCPCS/CPT Codes -->
+            <div id="hcpcs" class="border border-blue-200 rounded-lg overflow-hidden">
+                <div class="bg-blue-700 text-white px-5 py-3">
+                    <h2 class="text-lg font-bold">HCPCS/CPT Codes ({{ code_data.hcpc_codes|length }})</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-blue-50">
+                                <th class="text-left px-4 py-2 font-medium text-blue-800 w-28">Code</th>
+                                <th class="text-left px-4 py-2 font-medium text-blue-800">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in code_data.hcpc_codes %}
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-4 py-2 font-mono text-blue-700 font-medium">{{ h.hcpc_code_id }}</td>
+                                <td class="px-4 py-2 text-gray-700">{{ h.long_description or h.short_description or '' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if code_data and code_data.icd10_covered %}
+            <!-- ICD-10 Covered Codes -->
+            <div id="icd10-covered" class="border border-green-200 rounded-lg overflow-hidden">
+                <div class="bg-green-700 text-white px-5 py-3 flex items-center justify-between">
+                    <h2 class="text-lg font-bold">Covered ICD-10-CM Codes ({{ code_data.icd10_covered|length }})</h2>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="w-full text-sm">
+                        <thead class="sticky top-0">
+                            <tr class="bg-green-50">
+                                <th class="text-left px-4 py-2 font-medium text-green-800 w-28">Code</th>
+                                <th class="text-left px-4 py-2 font-medium text-green-800">Description</th>
+                                <th class="text-left px-4 py-2 font-medium text-green-800 w-16">Group</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ic in code_data.icd10_covered %}
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-4 py-1.5 font-mono text-green-700 font-medium">{{ ic.icd10_code_id }}</td>
+                                <td class="px-4 py-1.5 text-gray-700">{{ ic.description }}</td>
+                                <td class="px-4 py-1.5 text-gray-400 text-xs">{{ ic.icd10_covered_group }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if code_data and code_data.icd10_noncovered %}
+            <!-- ICD-10 Non-Covered Codes -->
+            <div id="icd10-noncovered" class="border border-red-200 rounded-lg overflow-hidden">
+                <div class="bg-red-700 text-white px-5 py-3">
+                    <h2 class="text-lg font-bold">Non-Covered ICD-10-CM Codes ({{ code_data.icd10_noncovered|length }})</h2>
+                </div>
+                {% if code_data.icd10_noncovered_groups %}
+                {% for g in code_data.icd10_noncovered_groups %}
+                {% if g.paragraph %}
+                <div class="px-5 py-2 bg-red-50 border-b border-red-100 text-sm text-red-800">
+                    <span class="font-medium">Group {{ g.icd10_noncovered_group }}:</span>
+                    <span class="prose-sm">{{ g.paragraph | safe }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="w-full text-sm">
+                        <thead class="sticky top-0">
+                            <tr class="bg-red-50">
+                                <th class="text-left px-4 py-2 font-medium text-red-800 w-28">Code</th>
+                                <th class="text-left px-4 py-2 font-medium text-red-800">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ic in code_data.icd10_noncovered %}
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-4 py-1.5 font-mono text-red-700 font-medium">{{ ic.icd10_code_id }}</td>
+                                <td class="px-4 py-1.5 text-gray-700">{{ ic.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if code_data and code_data.modifiers %}
+            <!-- Modifiers -->
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-600 text-white px-5 py-3">
+                    <h2 class="text-lg font-bold">HCPCS Modifiers ({{ code_data.modifiers|length }})</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="text-left px-4 py-2 font-medium text-gray-600 w-28">Modifier</th>
+                                <th class="text-left px-4 py-2 font-medium text-gray-600">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in code_data.modifiers %}
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-4 py-2 font-mono font-medium">{{ m.hcpc_modifier_code_id }}</td>
+                                <td class="px-4 py-2 text-gray-700">{{ m.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if code_data and code_data.mapping and code_data.mapping.groups %}
+            <!-- CPT ↔ ICD-10 Mapping by Group -->
+            <div id="mapping" class="border border-amber-200 rounded-lg overflow-hidden">
+                <div class="bg-amber-600 text-white px-5 py-3">
+                    <h2 class="text-lg font-bold">CPT/HCPCS &harr; ICD-10 Mapping by Group</h2>
+                </div>
+                <div class="p-5 space-y-4">
+                    {% for group in code_data.mapping.groups %}
+                    <div class="border border-amber-200 rounded-lg overflow-hidden">
+                        <div class="bg-amber-50 px-4 py-3 border-b border-amber-200">
+                            <h3 class="font-medium text-amber-900">Group {{ group.group_num }}</h3>
+                            {% if group.paragraph %}
+                            <div class="text-sm text-amber-800 mt-1 prose-sm">{{ group.paragraph | safe }}</div>
+                            {% endif %}
+                            {% if group.cpt_codes %}
+                            <div class="mt-2 flex gap-1 flex-wrap">
+                                {% for cpt in group.cpt_codes %}
+                                <span class="inline-block bg-blue-100 text-blue-800 text-xs font-mono px-2 py-0.5 rounded">{{ cpt }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if group.icd10_codes %}
+                        <div class="max-h-64 overflow-y-auto">
+                            <table class="w-full text-sm">
+                                <tbody>
+                                    {% for ic in group.icd10_codes %}
+                                    <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                        <td class="px-4 py-1 font-mono text-green-700 font-medium w-28">{{ ic.code }}</td>
+                                        <td class="px-4 py-1 text-gray-700">{{ ic.description }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="px-4 py-3 text-gray-500 text-sm">No ICD-10 codes in this group.</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── END STRUCTURED CODE SECTIONS ── #}
 
             <!-- CMS Coverage Policy -->
             {% if article.cms_cov_policy %}
-            <div>
+            <div id="coverage-policy">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">CMS Coverage Policy</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.cms_cov_policy | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
-            </div>
-            {% endif %}
-
-            <!-- Other Comments -->
-            {% if article.other_comments %}
-            <div>
-                <h3 class="text-lg font-medium text-gray-800 mb-2">Additional Information</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.other_comments | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.cms_cov_policy | unescape_cms | safe }}</div>
             </div>
             {% endif %}
 
             <!-- Keywords -->
             {% if article.keywords %}
-            <div>
+            <div id="keywords">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Keywords</h3>
                 <div class="bg-gray-50 p-4 rounded">
                     <p class="text-gray-700">{{ article.keywords }}</p>
@@ -102,9 +339,9 @@
 
             <!-- History -->
             {% if article.history_exp %}
-            <div>
+            <div id="revision-history">
                 <h3 class="text-lg font-medium text-gray-800 mb-2">Revision History</h3>
-                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.history_exp | replace('&lt;', '<') | replace('&gt;', '>') | replace('&sol;', '/') | replace('&amp;', '&') | replace('&quot;', '"') | safe }}</div>
+                <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded">{{ article.history_exp | unescape_cms | safe }}</div>
             </div>
             {% endif %}
         </div>
