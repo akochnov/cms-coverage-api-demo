@@ -65,7 +65,7 @@ def _parse_code_list(code_str: str) -> list[str]:
             continue
 
         # Check for range: "81162-81167"
-        range_match = re.match(r"^(\d{4,5})\s*[-–]\s*(\d{4,5})$", part)
+        range_match = re.match(r"^(\d{4,5})\s*[-\u2013]\s*(\d{4,5})$", part)
         if range_match:
             start, end = int(range_match.group(1)), int(range_match.group(2))
             if end - start <= 500:  # sanity check
@@ -73,7 +73,7 @@ def _parse_code_list(code_str: str) -> list[str]:
             continue
 
         # Check for alpha-prefixed range: "J9271-J9275"
-        alpha_range = re.match(r"^([A-Z])(\d{4})\s*[-–]\s*([A-Z])(\d{4})$", part)
+        alpha_range = re.match(r"^([A-Z])(\d{4})\s*[-\u2013]\s*([A-Z])(\d{4})$", part)
         if alpha_range and alpha_range.group(1) == alpha_range.group(3):
             prefix = alpha_range.group(1)
             start, end = int(alpha_range.group(2)), int(alpha_range.group(4))
@@ -94,7 +94,7 @@ def build_cpt_icd10_mapping(
     icd10_covered: list[dict],
     icd10_covered_groups: list[dict],
 ) -> dict:
-    """Build a structured CPT/HCPCS → ICD-10 mapping from article sub-endpoint data.
+    """Build a structured CPT/HCPCS -> ICD-10 mapping from article sub-endpoint data.
 
     Returns:
         {
@@ -194,7 +194,7 @@ def build_icd10_to_cpt_mapping(
     icd10_covered: list[dict],
     icd10_covered_groups: list[dict],
 ) -> dict:
-    """Build an ICD-10 → CPT/HCPCS reverse mapping.
+    """Build an ICD-10 -> CPT/HCPCS reverse mapping.
 
     Returns dict keyed by ICD-10 code with list of associated CPT codes.
     """

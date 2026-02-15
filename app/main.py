@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.routes import search, details, codes
+from app.routes import search, details
 
 app = FastAPI(
     title=settings.APP_TITLE,
@@ -18,7 +18,6 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # Include routers
 app.include_router(search.router)
 app.include_router(details.router)
-app.include_router(codes.router)
 
 
 # Register custom Jinja2 filter to unescape CMS HTML entities
@@ -30,7 +29,7 @@ def unescape_cms_html(value):
         .replace('&sol;', '/').replace('&amp;', '&').replace('&quot;', '"'))
 
 
-for tpl in (search.templates, details.templates, codes.templates):
+for tpl in (search.templates, details.templates):
     tpl.env.filters["unescape_cms"] = unescape_cms_html
 
 
